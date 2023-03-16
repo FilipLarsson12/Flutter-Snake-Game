@@ -12,10 +12,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: Stack(
-          children: [
-            xMovableContainer(left: 100, top: 100),
-          ],
+        body: GestureDetector(
+          onTap: () {
+            xMovableContainerStateGlobalKey.currentState?.startAnimation();
+          },
+          child: Stack(
+            children: [
+              xMovableContainer(
+                left: 100,
+                top: 100,
+                key: xMovableContainerStateGlobalKey,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -25,11 +34,16 @@ class MyApp extends StatelessWidget {
 class xMovableContainer extends StatefulWidget {
   final double left;
   final double top;
-  xMovableContainer({required this.left, required this.top});
+  xMovableContainer({required this.left, required this.top, Key? key})
+      : super(key: key);
 
   @override
   xMovableContainerState createState() => xMovableContainerState();
 }
+
+// Key för att komma åt xMovableContainerState från parent widget.
+final GlobalKey<xMovableContainerState> xMovableContainerStateGlobalKey =
+    GlobalKey<xMovableContainerState>();
 
 class xMovableContainerState extends State<xMovableContainer>
     with SingleTickerProviderStateMixin {
@@ -53,7 +67,9 @@ class xMovableContainerState extends State<xMovableContainer>
         left += 1;
       });
     });
+  }
 
+  void startLeftAnimation() {
     controller.repeat();
   }
 
