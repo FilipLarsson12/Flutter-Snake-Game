@@ -31,21 +31,36 @@ class xMovableContainer extends StatefulWidget {
   xMovableContainerState createState() => xMovableContainerState();
 }
 
-class xMovableContainerState extends State<xMovableContainer> {
+class xMovableContainerState extends State<xMovableContainer>
+    with SingleTickerProviderStateMixin {
   late double left;
   late double top;
+  late AnimationController controller;
 
   @override
   void initState() {
     super.initState();
     left = widget.left;
     top = widget.top;
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    controller.addListener(() {
+      setState(() {
+        left += 1;
+      });
+    });
+
+    controller.repeat();
   }
 
-  void updatePosition() {
-    setState(() {
-      left += 10;
-    });
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,13 +68,10 @@ class xMovableContainerState extends State<xMovableContainer> {
     return Positioned(
       left: left,
       top: top,
-      child: GestureDetector(
-        onTap: updatePosition,
-        child: Container(
-          decoration: BoxDecoration(color: Colors.black),
-          width: 50,
-          height: 10,
-        ),
+      child: Container(
+        decoration: BoxDecoration(color: Colors.black),
+        width: 50,
+        height: 10,
       ),
     );
   }
