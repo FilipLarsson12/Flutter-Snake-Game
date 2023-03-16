@@ -14,11 +14,13 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         body: GestureDetector(
           onTap: () {
+            xMovableContainerStateGlobalKey.currentState?.incrementDirection();
             xMovableContainerStateGlobalKey.currentState?.startAnimation();
           },
           child: Stack(
             children: [
               xMovableContainer(
+                direction: 0,
                 left: 100,
                 top: 100,
                 key: xMovableContainerStateGlobalKey,
@@ -32,9 +34,14 @@ class MyApp extends StatelessWidget {
 }
 
 class xMovableContainer extends StatefulWidget {
+  final int direction;
   final double left;
   final double top;
-  xMovableContainer({required this.left, required this.top, Key? key})
+  xMovableContainer(
+      {required this.direction,
+      required this.left,
+      required this.top,
+      Key? key})
       : super(key: key);
 
   @override
@@ -47,6 +54,7 @@ final GlobalKey<xMovableContainerState> xMovableContainerStateGlobalKey =
 
 class xMovableContainerState extends State<xMovableContainer>
     with SingleTickerProviderStateMixin {
+  late int direction;
   late double left;
   late double top;
   late AnimationController controller;
@@ -54,6 +62,7 @@ class xMovableContainerState extends State<xMovableContainer>
   @override
   void initState() {
     super.initState();
+    direction = widget.direction;
     left = widget.left;
     top = widget.top;
 
@@ -64,12 +73,24 @@ class xMovableContainerState extends State<xMovableContainer>
 
     controller.addListener(() {
       setState(() {
-        left += 1;
+        if ((direction % 4) == 1) {
+          left += 1;
+        } else if ((direction % 4) == 2) {
+          top += 1;
+        } else if ((direction % 4) == 3) {
+          left -= 1;
+        } else if ((direction % 4) == 0) {
+          top -= 1;
+        }
       });
     });
   }
 
-  void startLeftAnimation() {
+  void incrementDirection() {
+    direction++;
+  }
+
+  void startAnimation() {
     controller.repeat();
   }
 
