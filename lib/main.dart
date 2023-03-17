@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(const MyApp());
@@ -10,52 +11,115 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: snakeGame(),
+      home: GestureDetector(
+        onTap: () {
+          snakeGameStateGlobalKey.currentState?.incrementDirection();
+          snakeGameStateGlobalKey.currentState?.startAnimation();
+        },
+        child: snakeGame(
+          key: snakeGameStateGlobalKey,
+        ),
+      ),
     );
   }
 }
 
 class snakeGame extends StatefulWidget {
-  double leftPosition = 100;
-  double topPosition = 100;
+  double headLeftPosition = 100;
+  double headTopPosition = 100;
   int direction = 0;
 
-  snakeGame();
+  snakeGame({Key? key}) : super(key: key);
 
   @override
   snakeGameState createState() => snakeGameState();
 }
 
+// Key för att komma åt snakeGameState från parent widget.
+final GlobalKey<snakeGameState> snakeGameStateGlobalKey =
+    GlobalKey<snakeGameState>();
+
 class snakeGameState extends State<snakeGame>
     with SingleTickerProviderStateMixin {
-  late double leftPosition;
-  late double topPosition;
+  late double headLeftPosition;
+  late double headTopPosition;
+  final random = Random();
   int length = 5;
   late int direction;
   late List<List<double>> coordinates;
   late AnimationController controller;
+  late double fruitLeftCoordinate;
+  late double fruitTopCoordinate;
+  final borderLeft = 0;
+  final borderRight = 414;
+  final borderTop = 0;
+  final borderBottom = 828;
+
 
   @override
   void initState() {
-    leftPosition = widget.leftPosition;
-    topPosition = widget.topPosition;
+    headLeftPosition = widget.headLeftPosition;
+    headTopPosition = widget.headTopPosition;
     direction = widget.direction;
 
     coordinates = [
-      [widget.leftPosition, widget.topPosition],
-      [widget.leftPosition - 5, widget.topPosition],
-      [widget.leftPosition - 10, widget.topPosition],
-      [widget.leftPosition - 15, widget.topPosition],
-      [widget.leftPosition - 20, widget.topPosition],
+      [widget.headLeftPosition, widget.headTopPosition],
+      [widget.headLeftPosition - 5, widget.headTopPosition],
+      [widget.headLeftPosition - 10, widget.headTopPosition],
+      [widget.headLeftPosition - 15, widget.headTopPosition],
+      [widget.headLeftPosition - 20, widget.headTopPosition],
     ];
+
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
 
     controller.addListener(() {
       setState(() {
-        if ((direction % 4) == 1) {}
+        if ((direction % 4) == 1) {
+          headLeftPosition += 2;
+          updateCoordinates(headLeftPosition, headTopPosition);
+        } else if ((direction % 4) == 2) {
+          headTopPosition += 2;
+          updateCoordinates(headLeftPosition, headTopPosition);
+        } else if ((direction % 4) == 3) {
+          headLeftPosition -= 2;
+          updateCoordinates(headLeftPosition, headTopPosition);
+        } else if ((direction % 4) == 0) {
+          headTopPosition -= 2;
+          updateCoordinates(headLeftPosition, headTopPosition);
+        }
       });
     });
+    
+    fruitLeftCoordinate = 
+  }
+
+  /* Method to update the entire coordinate list of the Snake. 
+  The movement of the Snake head should be dependent on direction
+  and the movement of the remaining snake parts should be dependent
+  on where the previous part of the snake was.
+  
+  */
+  void updateCoordinates(
+      double newHeadLeftCoordinate, double newHeadTopCoordinate) {
+    double nextLeftCoordinate = coordinates[0][0];
+    double nextTopCoordinate = coordinates[0][1];
+    double currentLeftCoordinate = 0;
+    double currentTopCoordinate = 0;
+
+    for (int i = 0; i < length; i++) {
+      if (i == 0) {
+        coordinates[i][0] = newHeadLeftCoordinate;
+        coordinates[i][1] = newHeadTopCoordinate;
+      } else {
+        currentLeftCoordinate = coordinates[i][0];
+        currentTopCoordinate = coordinates[i][1];
+        coordinates[i][0] = nextLeftCoordinate;
+        coordinates[i][1] = nextTopCoordinate;
+        nextLeftCoordinate = currentLeftCoordinate;
+        nextTopCoordinate = currentTopCoordinate;
+      }
+    }
   }
 
   void incrementDirection() {
@@ -74,12 +138,12 @@ class snakeGameState extends State<snakeGame>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Scaffold(
-        body: snake(
-          length: length,
-          listOfSnakeParts: coordinates,
-        ),
+    return Scaffold(
+      body: snake(
+        length: length,
+        listOfSnakeParts: coordinates,
+        fruitLeft: 200,
+        fruitTop: 200,
       ),
     );
   }
@@ -131,10 +195,36 @@ class SnakePart extends StatelessWidget {
   }
 }
 
+class Fruit extends StatelessWidget {
+  final double left;
+  final double top;
+
+  Fruit({required this.left, required this.top});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      top: top,
+      child: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(color: Colors.orange),
+      ),
+    );
+  }
+}
+
 class snake extends StatelessWidget {
   int length;
   List<List<double>> listOfSnakeParts;
-  snake({required this.length, required this.listOfSnakeParts});
+  double fruitLeft;
+  double fruitTop;
+  snake(
+      {required this.length,
+      required this.listOfSnakeParts,
+      required this.fruitLeft,
+      required this.fruitTop});
 
   @override
   Widget build(BuildContext context) {
@@ -144,8 +234,10 @@ class snake extends StatelessWidget {
         final double top = listOfSnakeParts[index][1];
         if (index == 0) {
           return SnakeHead(left: left, top: top);
-        } else {
+        } else if (index < length - 1) {
           return SnakePart(left: left, top: top);
+        } else {
+          return Fruit(left: fruitLeft, top: fruitTop);
         }
       }),
     );
