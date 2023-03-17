@@ -7,25 +7,175 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: snakeGame(),
+    );
+  }
+}
+
+class snakeGame extends StatefulWidget {
+  double leftPosition = 100;
+  double topPosition = 100;
+  int direction = 0;
+
+  snakeGame();
+
+  @override
+  snakeGameState createState() => snakeGameState();
+}
+
+class snakeGameState extends State<snakeGame>
+    with SingleTickerProviderStateMixin {
+  late double leftPosition;
+  late double topPosition;
+  int length = 5;
+  late int direction;
+  late List<List<double>> coordinates;
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    leftPosition = widget.leftPosition;
+    topPosition = widget.topPosition;
+    direction = widget.direction;
+
+    coordinates = [
+      [widget.leftPosition, widget.topPosition],
+      [widget.leftPosition - 5, widget.topPosition],
+      [widget.leftPosition - 10, widget.topPosition],
+      [widget.leftPosition - 15, widget.topPosition],
+      [widget.leftPosition - 20, widget.topPosition],
+    ];
+    controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+
+    controller.addListener(() {
+      setState(() {
+        if ((direction % 4) == 1) {}
+      });
+    });
+  }
+
+  void incrementDirection() {
+    direction++;
+  }
+
+  void startAnimation() {
+    controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Scaffold(
+        body: snake(
+          length: length,
+          listOfSnakeParts: coordinates,
+        ),
+      ),
+    );
+  }
+}
+
+class SnakeHead extends StatelessWidget {
+  final double left;
+  final double top;
+
+  SnakeHead({
+    required this.left,
+    required this.top,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      top: top,
+      child: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(color: Colors.white),
+      ),
+    );
+  }
+}
+
+class SnakePart extends StatelessWidget {
+  final double left;
+  final double top;
+
+  SnakePart({
+    required this.left,
+    required this.top,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      top: top,
+      child: Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(color: Colors.red),
+      ),
+    );
+  }
+}
+
+class snake extends StatelessWidget {
+  int length;
+  List<List<double>> listOfSnakeParts;
+  snake({required this.length, required this.listOfSnakeParts});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: List.generate(length, (index) {
+        final double left = listOfSnakeParts[index][0];
+        final double top = listOfSnakeParts[index][1];
+        if (index == 0) {
+          return SnakeHead(left: left, top: top);
+        } else {
+          return SnakePart(left: left, top: top);
+        }
+      }),
+    );
+  }
+}
+
+
+/*
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: GestureDetector(
         onTap: () {
-          snakeHeadStateGlobalKey.currentState?.incrementDirection();
+          SnakeHeadStateGlobalKey.currentState?.incrementDirection();
           snakePartStateGlobalKey.currentState?.incrementDirection();
-          snakeHeadStateGlobalKey.currentState?.startAnimation();
+          SnakeHeadStateGlobalKey.currentState?.startAnimation();
           snakePartStateGlobalKey.currentState?.startAnimation();
         },
         child: Scaffold(
           body: Stack(
             children: [
-              snakeHead(
+              SnakeHead(
                 direction: 0,
                 left: 100,
                 top: 100,
-                key: snakeHeadStateGlobalKey,
+                key: SnakeHeadStateGlobalKey,
               ),
               snakePart(
                 lag: 0,
@@ -42,11 +192,11 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class snakeHead extends StatefulWidget {
+class SnakeHead extends StatefulWidget {
   final int direction;
   final double left;
   final double top;
-  snakeHead(
+  SnakeHead(
       {required this.direction,
       required this.left,
       required this.top,
@@ -54,14 +204,14 @@ class snakeHead extends StatefulWidget {
       : super(key: key);
 
   @override
-  snakeHeadState createState() => snakeHeadState();
+  SnakeHeadState createState() => SnakeHeadState();
 }
 
-// Key för att komma åt snakeHeadState från parent widget.
-final GlobalKey<snakeHeadState> snakeHeadStateGlobalKey =
-    GlobalKey<snakeHeadState>();
+// Key för att komma åt SnakeHeadState från parent widget.
+final GlobalKey<SnakeHeadState> SnakeHeadStateGlobalKey =
+    GlobalKey<SnakeHeadState>();
 
-class snakeHeadState extends State<snakeHead>
+class SnakeHeadState extends State<SnakeHead>
     with SingleTickerProviderStateMixin {
   late int direction;
   late double left;
@@ -209,3 +359,6 @@ class snakePartState extends State<snakePart>
     );
   }
 }
+
+*/
+
