@@ -65,6 +65,7 @@ class snakeGameState extends State<snakeGame>
       setState(() {
         collisionWithFruit();
         collisionWithSnake();
+        collisionWithWall();
         if ((direction % 4) == 1) {
           headLeftPosition += 3;
           updateCoordinates(headLeftPosition, headTopPosition);
@@ -135,6 +136,9 @@ class snakeGameState extends State<snakeGame>
     }
   }
 
+  /* Check if the snake has collided with itself. 
+  If it has the game is over.
+  */
   void collisionWithSnake() {
     for (int i = 10; i < length; i++) {
       if ((coordinates[0][0] >= coordinates[i][0] - 10 &&
@@ -144,6 +148,20 @@ class snakeGameState extends State<snakeGame>
         length = 0;
         coordinates.clear();
       }
+    }
+  }
+
+  /* Check if the snake has collided with the wall. 
+  If it has the game is over.
+  */
+
+  void collisionWithWall() {
+    if ((coordinates[0][0] > 358 ||
+        coordinates[0][0] < 0 ||
+        coordinates[0][1] < 0 ||
+        coordinates[0][1] > 770)) {
+      length = 0;
+      coordinates.clear();
     }
   }
 
