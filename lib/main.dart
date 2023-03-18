@@ -64,6 +64,7 @@ class snakeGameState extends State<snakeGame>
     controller.addListener(() {
       setState(() {
         collisionWithFruit();
+        collisionWithSnake();
         if ((direction % 4) == 1) {
           headLeftPosition += 3;
           updateCoordinates(headLeftPosition, headTopPosition);
@@ -131,6 +132,18 @@ class snakeGameState extends State<snakeGame>
       fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
       length += 2;
       updateCoordinatesWhenLengthIncreases(direction);
+    }
+  }
+
+  void collisionWithSnake() {
+    for (int i = 10; i < length; i++) {
+      if ((coordinates[0][0] >= coordinates[i][0] - 10 &&
+              coordinates[0][0] <= coordinates[i][0] + 10) &&
+          (coordinates[0][1] >= coordinates[i][1] - 10 &&
+              coordinates[0][1] <= coordinates[i][1] + 10)) {
+        length = 0;
+        coordinates.clear();
+      }
     }
   }
 
