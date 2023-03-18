@@ -55,7 +55,6 @@ class snakeGameState extends State<snakeGame>
   final borderTop = 0;
   final borderBottom = 828;
 
-
   @override
   void initState() {
     headLeftPosition = widget.headLeftPosition;
@@ -69,12 +68,15 @@ class snakeGameState extends State<snakeGame>
       [widget.headLeftPosition - 15, widget.headTopPosition],
       [widget.headLeftPosition - 20, widget.headTopPosition],
     ];
+    fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
+    fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
 
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
 
     controller.addListener(() {
       setState(() {
+        collisionWithFruit();
         if ((direction % 4) == 1) {
           headLeftPosition += 2;
           updateCoordinates(headLeftPosition, headTopPosition);
@@ -90,8 +92,6 @@ class snakeGameState extends State<snakeGame>
         }
       });
     });
-    
-    fruitLeftCoordinate = 
   }
 
   /* Method to update the entire coordinate list of the Snake. 
@@ -122,6 +122,34 @@ class snakeGameState extends State<snakeGame>
     }
   }
 
+  void collisionWithFruit() {
+    if ((coordinates[0][0] >= fruitLeftCoordinate - 10 &&
+            coordinates[0][0] <= fruitLeftCoordinate + 10) &&
+        (coordinates[0][1] >= fruitTopCoordinate - 10 &&
+            coordinates[0][1] <= fruitTopCoordinate + 10)) {
+      fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
+      fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
+      length += 1;
+      updateCoordinatesWhenLengthIncreases(direction);
+    }
+  }
+
+  void updateCoordinatesWhenLengthIncreases(int direction) {
+    double newContainerLeftCoordinate = coordinates[length - 2][0];
+    double newContainerTopCoordinate = coordinates[length - 2][1];
+    if (direction % 4 == 1) {
+      newContainerLeftCoordinate -= 1;
+    } else if (direction % 4 == 2) {
+      newContainerTopCoordinate -= 1;
+    } else if (direction % 4 == 3) {
+      newContainerLeftCoordinate += 1;
+    } else if (direction % 4 == 0) {
+      newContainerTopCoordinate += 1;
+    }
+
+    coordinates.add([newContainerLeftCoordinate, newContainerTopCoordinate]);
+  }
+
   void incrementDirection() {
     direction++;
   }
@@ -142,8 +170,8 @@ class snakeGameState extends State<snakeGame>
       body: snake(
         length: length,
         listOfSnakeParts: coordinates,
-        fruitLeft: 200,
-        fruitTop: 200,
+        fruitLeft: fruitLeftCoordinate,
+        fruitTop: fruitTopCoordinate,
       ),
     );
   }
