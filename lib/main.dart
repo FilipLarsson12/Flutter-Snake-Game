@@ -118,6 +118,10 @@ class snakeGameState extends State<snakeGame>
     }
   }
 
+  /* Check if the snake has collided with fruit. 
+  If it has generate new fruit coordinates and increase the snake length.
+  */
+
   void collisionWithFruit() {
     if ((coordinates[0][0] >= fruitLeftCoordinate - 10 &&
             coordinates[0][0] <= fruitLeftCoordinate + 10) &&
@@ -125,25 +129,33 @@ class snakeGameState extends State<snakeGame>
             coordinates[0][1] <= fruitTopCoordinate + 10)) {
       fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
       fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
-      length += 1;
+      length += 2;
       updateCoordinatesWhenLengthIncreases(direction);
     }
   }
 
   void updateCoordinatesWhenLengthIncreases(int direction) {
-    double newContainerLeftCoordinate = coordinates[length - 2][0];
-    double newContainerTopCoordinate = coordinates[length - 2][1];
+    double newContainerLeftCoordinate = coordinates[length - 3][0];
+    double newContainerTopCoordinate = coordinates[length - 3][1];
+    double secondNewContainerLeftCoordinate = coordinates[length - 3][0];
+    double secondNewContainerTopCoordinate = coordinates[length - 3][1];
     if (direction % 4 == 1) {
       newContainerLeftCoordinate -= 3;
+      secondNewContainerLeftCoordinate -= 6;
     } else if (direction % 4 == 2) {
       newContainerTopCoordinate -= 3;
+      secondNewContainerTopCoordinate -= 6;
     } else if (direction % 4 == 3) {
       newContainerLeftCoordinate += 3;
+      secondNewContainerLeftCoordinate += 6;
     } else if (direction % 4 == 0) {
       newContainerTopCoordinate += 3;
+      secondNewContainerTopCoordinate += 6;
     }
 
     coordinates.add([newContainerLeftCoordinate, newContainerTopCoordinate]);
+    coordinates.add(
+        [secondNewContainerLeftCoordinate, secondNewContainerTopCoordinate]);
   }
 
   void incrementDirection() {
