@@ -190,7 +190,7 @@ class SnakeHead extends StatelessWidget {
       child: Container(
         width: 10,
         height: 10,
-        decoration: BoxDecoration(color: Colors.white),
+        decoration: BoxDecoration(color: Colors.black),
       ),
     );
   }
@@ -199,10 +199,11 @@ class SnakeHead extends StatelessWidget {
 class SnakePart extends StatelessWidget {
   final double left;
   final double top;
-
+  final Color color;
   SnakePart({
     required this.left,
     required this.top,
+    required this.color,
   });
 
   @override
@@ -213,7 +214,7 @@ class SnakePart extends StatelessWidget {
       child: Container(
         width: 10,
         height: 10,
-        decoration: BoxDecoration(color: Colors.red),
+        decoration: BoxDecoration(color: color),
       ),
     );
   }
@@ -266,7 +267,19 @@ class snake extends StatelessWidget {
             if (index == 0) {
               return SnakeHead(left: left, top: top);
             } else if (index < length - 1) {
-              return SnakePart(left: left, top: top);
+              if (index % 2 == 0) {
+                return SnakePart(
+                  left: left,
+                  top: top,
+                  color: Colors.red,
+                );
+              } else {
+                return SnakePart(
+                  left: left,
+                  top: top,
+                  color: Colors.black,
+                );
+              }
             } else {
               return Fruit(left: fruitLeft, top: fruitTop);
             }
