@@ -25,10 +25,6 @@ class MyApp extends StatelessWidget {
 }
 
 class snakeGame extends StatefulWidget {
-  double headLeftPosition = 100;
-  double headTopPosition = 100;
-  int direction = 0;
-
   snakeGame({Key? key}) : super(key: key);
 
   @override
@@ -41,12 +37,14 @@ final GlobalKey<snakeGameState> snakeGameStateGlobalKey =
 
 class snakeGameState extends State<snakeGame>
     with SingleTickerProviderStateMixin {
-  late double headLeftPosition;
-  late double headTopPosition;
+  int start = 0;
+  late double headLeftPosition = 100;
+  late double headTopPosition = 100;
   final random = Random();
-  int length = 5;
-  late int direction;
-  late List<List<double>> coordinates;
+  int length = 10;
+  int direction = 0;
+  late List<List<double>> coordinates =
+      List<List<double>>.empty(growable: true);
   late AnimationController controller;
   late double fruitLeftCoordinate;
   late double fruitTopCoordinate;
@@ -57,20 +55,9 @@ class snakeGameState extends State<snakeGame>
 
   @override
   void initState() {
-    headLeftPosition = widget.headLeftPosition;
-    headTopPosition = widget.headTopPosition;
-    direction = widget.direction;
-
-    coordinates = [
-      [widget.headLeftPosition, widget.headTopPosition],
-      [widget.headLeftPosition - 5, widget.headTopPosition],
-      [widget.headLeftPosition - 10, widget.headTopPosition],
-      [widget.headLeftPosition - 15, widget.headTopPosition],
-      [widget.headLeftPosition - 20, widget.headTopPosition],
-    ];
     fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
     fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
-
+    coordinates = createSnake();
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
 
@@ -92,6 +79,15 @@ class snakeGameState extends State<snakeGame>
         }
       });
     });
+  }
+
+  List<List<double>> createSnake() {
+    List<List<double>> startCoordinates =
+        List<List<double>>.empty(growable: true);
+    for (int i = 0; i < length; i++) {
+      startCoordinates.add([100 - (i * 3), 100]);
+    }
+    return startCoordinates;
   }
 
   /* Method to update the entire coordinate list of the Snake. 
