@@ -50,10 +50,10 @@ class snakeGameState extends State<snakeGame>
   late AnimationController controller;
   late double fruitLeftCoordinate;
   late double fruitTopCoordinate;
-  final borderLeft = 0;
-  final borderRight = 414;
-  final borderTop = 0;
-  final borderBottom = 828;
+  final borderLeft = 23;
+  final borderRight = 381;
+  final borderTop = 84;
+  final borderBottom = 852;
 
   @override
   void initState() {
@@ -78,16 +78,16 @@ class snakeGameState extends State<snakeGame>
       setState(() {
         collisionWithFruit();
         if ((direction % 4) == 1) {
-          headLeftPosition += 2;
+          headLeftPosition += 3;
           updateCoordinates(headLeftPosition, headTopPosition);
         } else if ((direction % 4) == 2) {
-          headTopPosition += 2;
+          headTopPosition += 3;
           updateCoordinates(headLeftPosition, headTopPosition);
         } else if ((direction % 4) == 3) {
-          headLeftPosition -= 2;
+          headLeftPosition -= 3;
           updateCoordinates(headLeftPosition, headTopPosition);
         } else if ((direction % 4) == 0) {
-          headTopPosition -= 2;
+          headTopPosition -= 3;
           updateCoordinates(headLeftPosition, headTopPosition);
         }
       });
@@ -138,13 +138,13 @@ class snakeGameState extends State<snakeGame>
     double newContainerLeftCoordinate = coordinates[length - 2][0];
     double newContainerTopCoordinate = coordinates[length - 2][1];
     if (direction % 4 == 1) {
-      newContainerLeftCoordinate -= 1;
+      newContainerLeftCoordinate -= 3;
     } else if (direction % 4 == 2) {
-      newContainerTopCoordinate -= 1;
+      newContainerTopCoordinate -= 3;
     } else if (direction % 4 == 3) {
-      newContainerLeftCoordinate += 1;
+      newContainerLeftCoordinate += 3;
     } else if (direction % 4 == 0) {
-      newContainerTopCoordinate += 1;
+      newContainerTopCoordinate += 3;
     }
 
     coordinates.add([newContainerLeftCoordinate, newContainerTopCoordinate]);
@@ -256,18 +256,27 @@ class snake extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: List.generate(length, (index) {
-        final double left = listOfSnakeParts[index][0];
-        final double top = listOfSnakeParts[index][1];
-        if (index == 0) {
-          return SnakeHead(left: left, top: top);
-        } else if (index < length - 1) {
-          return SnakePart(left: left, top: top);
-        } else {
-          return Fruit(left: fruitLeft, top: fruitTop);
-        }
-      }),
+    return Center(
+      child: Container(
+        margin: EdgeInsets.only(top: 50),
+        width: 370,
+        height: 780,
+        decoration:
+            BoxDecoration(border: Border.all(width: 2.0, color: Colors.black)),
+        child: Stack(
+          children: List.generate(length, (index) {
+            final double left = listOfSnakeParts[index][0];
+            final double top = listOfSnakeParts[index][1];
+            if (index == 0) {
+              return SnakeHead(left: left, top: top);
+            } else if (index < length - 1) {
+              return SnakePart(left: left, top: top);
+            } else {
+              return Fruit(left: fruitLeft, top: fruitTop);
+            }
+          }),
+        ),
+      ),
     );
   }
 }
