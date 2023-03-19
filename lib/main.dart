@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+  MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,7 +36,8 @@ final GlobalKey<snakeGameState> snakeGameStateGlobalKey =
 
 class snakeGameState extends State<snakeGame>
     with SingleTickerProviderStateMixin {
-  int start = 0;
+  bool gameOver = false;
+  int score = 0;
   late double headLeftPosition = 100;
   late double headTopPosition = 100;
   final random = Random();
@@ -129,6 +129,7 @@ class snakeGameState extends State<snakeGame>
             coordinates[0][0] <= fruitLeftCoordinate + 10) &&
         (coordinates[0][1] >= fruitTopCoordinate - 10 &&
             coordinates[0][1] <= fruitTopCoordinate + 10)) {
+      score++;
       fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
       fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
       length += 2;
@@ -145,8 +146,9 @@ class snakeGameState extends State<snakeGame>
               coordinates[0][0] <= coordinates[i][0] + 10) &&
           (coordinates[0][1] >= coordinates[i][1] - 10 &&
               coordinates[0][1] <= coordinates[i][1] + 10)) {
-        length = 0;
+        length = 1;
         coordinates.clear();
+        gameOver = true;
       }
     }
   }
@@ -160,8 +162,9 @@ class snakeGameState extends State<snakeGame>
         coordinates[0][0] < 0 ||
         coordinates[0][1] < 0 ||
         coordinates[0][1] > 770)) {
-      length = 0;
+      length = 1;
       coordinates.clear();
+      gameOver = true;
     }
   }
 
@@ -207,6 +210,7 @@ class snakeGameState extends State<snakeGame>
   Widget build(BuildContext context) {
     return Scaffold(
       body: snake(
+        score: score,
         length: length,
         listOfSnakeParts: coordinates,
         fruitLeft: fruitLeftCoordinate,
@@ -284,51 +288,79 @@ class Fruit extends StatelessWidget {
 }
 
 class snake extends StatelessWidget {
+  int score;
   int length;
   List<List<double>> listOfSnakeParts;
   double fruitLeft;
   double fruitTop;
   snake(
-      {required this.length,
+      {required this.score,
+      required this.length,
       required this.listOfSnakeParts,
       required this.fruitLeft,
       required this.fruitTop});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        margin: EdgeInsets.only(top: 50),
-        width: 370,
-        height: 780,
-        decoration:
-            BoxDecoration(border: Border.all(width: 2.0, color: Colors.black)),
-        child: Stack(
-          children: List.generate(length, (index) {
-            final double left = listOfSnakeParts[index][0];
-            final double top = listOfSnakeParts[index][1];
-            if (index == 0) {
-              return SnakeHead(left: left, top: top);
-            } else if (index < length - 1) {
-              if (index % 2 == 0) {
-                return SnakePart(
-                  left: left,
-                  top: top,
-                  color: Colors.red,
-                );
-              } else {
-                return SnakePart(
-                  left: left,
-                  top: top,
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.only(bottom: 2),
+          margin: EdgeInsets.only(top: 50, bottom: 5, right: 270),
+          height: 25,
+          width: 100,
+          decoration: BoxDecoration(color: Colors.white),
+          child: Text(
+            "Score: $score",
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.black,
+              fontFamily: 'RetroGaming',
+              shadows: [
+                Shadow(
+                  blurRadius: 2.0,
                   color: Colors.black,
-                );
-              }
-            } else {
-              return Fruit(left: fruitLeft, top: fruitTop);
-            }
-          }),
+                  offset: Offset(1.0, 1.0),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+        Center(
+          child: Container(
+            margin: EdgeInsets.only(bottom: 5),
+            width: 370,
+            height: 780,
+            decoration: BoxDecoration(
+                border: Border.all(width: 2.0, color: Colors.black)),
+            child: Stack(
+              children: List.generate(length, (index) {
+                final double left = listOfSnakeParts[index][0];
+                final double top = listOfSnakeParts[index][1];
+                if (index == 0) {
+                  return SnakeHead(left: left, top: top);
+                } else if (index < length - 1) {
+                  if (index % 2 == 0) {
+                    return SnakePart(
+                      left: left,
+                      top: top,
+                      color: Colors.red,
+                    );
+                  } else {
+                    return SnakePart(
+                      left: left,
+                      top: top,
+                      color: Colors.black,
+                    );
+                  }
+                } else {
+                  return Fruit(left: fruitLeft, top: fruitTop);
+                }
+              }),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
