@@ -281,7 +281,19 @@ class Fruit extends StatelessWidget {
       child: Container(
         width: 10,
         height: 10,
-        decoration: BoxDecoration(color: Colors.orange),
+        decoration: BoxDecoration(color: Color.fromARGB(176, 44, 193, 14)),
+        child: Center(
+          child: Container(
+            padding: EdgeInsets.only(bottom: 5),
+            constraints: BoxConstraints(
+              maxWidth: 4.0,
+              maxHeight: 4.0,
+              minWidth: 4.0,
+              minHeight: 4.0,
+            ),
+            decoration: BoxDecoration(color: Color.fromARGB(255, 79, 228, 84)),
+          ),
+        ),
       ),
     );
   }
