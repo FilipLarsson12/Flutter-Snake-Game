@@ -102,23 +102,66 @@ class snakeGameState extends State<snakeGame>
         collisionWithSnake();
         collisionWithWall();
         if ((direction % 4) == 1) {
-          headLeftPosition += 3;
-          updateCoordinates(headLeftPosition, headTopPosition);
+          if (frame % 10 == 0) {
+            headTopPosition += 2;
+            headLeftPosition += 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else if (frame % 10 == 4) {
+            headTopPosition -= 2;
+            headLeftPosition += 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else {
+            headLeftPosition += 4;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          }
         } else if ((direction % 4) == 2) {
-          headTopPosition += 3;
-          updateCoordinates(headLeftPosition, headTopPosition);
-        } else if ((direction % 4) == 3) {
-          headLeftPosition -= 3;
-          updateCoordinates(headLeftPosition, headTopPosition);
-        } else if ((direction % 4) == 0) {
-          if (frame % 2 == 0) {
-            headTopPosition -= 3;
+          if (frame % 10 == 0) {
+            headTopPosition += 2;
             headLeftPosition -= 2;
             frame++;
             updateCoordinates(headLeftPosition, headTopPosition);
-          } else if (frame % 2 == 1) {
-            headTopPosition -= 3;
+          } else if (frame % 10 == 5) {
+            headTopPosition += 2;
             headLeftPosition += 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else {
+            headTopPosition += 4;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          }
+        } else if ((direction % 4) == 3) {
+          if (frame % 10 == 0) {
+            headTopPosition -= 2;
+            headLeftPosition -= 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else if (frame % 10 == 4) {
+            headTopPosition += 2;
+            headLeftPosition -= 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else {
+            headLeftPosition -= 4;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          }
+        } else if ((direction % 4) == 0) {
+          if (frame % 10 == 0) {
+            headTopPosition -= 2;
+            headLeftPosition -= 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else if (frame % 10 == 5) {
+            headTopPosition -= 2;
+            headLeftPosition += 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else {
+            headTopPosition -= 4;
             frame++;
             updateCoordinates(headLeftPosition, headTopPosition);
           }
