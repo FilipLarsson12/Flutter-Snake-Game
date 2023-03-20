@@ -8,15 +8,34 @@ void main() {
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
-/*
   Map<String, WidgetBuilder> views = {
-    '/start': (BuildContext (context) => )
+    '/start': (BuildContext context) => StartScreen(),
+    '/snakeGame': (BuildContext context) => snakeGame(),
   };
-*/
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: snakeGame(),
+      initialRoute: '/start',
+      routes: views,
+    );
+  }
+}
+
+class StartScreen extends StatelessWidget {
+  StartScreen();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.orange),
+      child: Center(
+        child: ElevatedButton(
+          child: Text("Starta Spel"),
+          onPressed: () {
+            Navigator.pushNamed(context, '/snakeGame');
+          },
+        ),
+      ),
     );
   }
 }
