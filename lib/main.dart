@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   Map<String, WidgetBuilder> views = {
     '/start': (BuildContext context) => StartScreen(),
     '/snakeGame': (BuildContext context) => snakeGame(),
+    '/gameOverScreen': (BuildContext context) => gameOverScreen(),
   };
 
   @override
@@ -40,6 +41,22 @@ class StartScreen extends StatelessWidget {
   }
 }
 
+class gameOverScreen extends StatelessWidget {
+  gameOverScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: Colors.red),
+      child: Center(
+          child: Text(
+        "Game Over!",
+        style: TextStyle(color: Colors.black, fontSize: 20),
+      )),
+    );
+  }
+}
+
 class snakeGame extends StatefulWidget {
   snakeGame({Key? key}) : super(key: key);
 
@@ -55,6 +72,7 @@ class snakeGameState extends State<snakeGame>
     with SingleTickerProviderStateMixin {
   bool gameOver = false;
   int score = 0;
+  int frame = 0;
   late double headLeftPosition = 100;
   late double headTopPosition = 100;
   final random = Random();
@@ -93,8 +111,17 @@ class snakeGameState extends State<snakeGame>
           headLeftPosition -= 3;
           updateCoordinates(headLeftPosition, headTopPosition);
         } else if ((direction % 4) == 0) {
-          headTopPosition -= 3;
-          updateCoordinates(headLeftPosition, headTopPosition);
+          if (frame % 2 == 0) {
+            headTopPosition -= 3;
+            headLeftPosition -= 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          } else if (frame % 2 == 1) {
+            headTopPosition -= 3;
+            headLeftPosition += 2;
+            frame++;
+            updateCoordinates(headLeftPosition, headTopPosition);
+          }
         }
       });
     });
@@ -163,8 +190,6 @@ class snakeGameState extends State<snakeGame>
               coordinates[0][0] <= coordinates[i][0] + 10) &&
           (coordinates[0][1] >= coordinates[i][1] - 10 &&
               coordinates[0][1] <= coordinates[i][1] + 10)) {
-        length = 1;
-        coordinates.clear();
         gameOver = true;
       }
     }
@@ -179,8 +204,6 @@ class snakeGameState extends State<snakeGame>
         coordinates[0][0] < 0 ||
         coordinates[0][1] < 0 ||
         coordinates[0][1] > 770)) {
-      length = 1;
-      coordinates.clear();
       gameOver = true;
     }
   }
@@ -225,21 +248,26 @@ class snakeGameState extends State<snakeGame>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        incrementDirection();
-        startAnimation();
-      },
-      child: Scaffold(
-        body: snake(
-          score: score,
-          length: length,
-          listOfSnakeParts: coordinates,
-          fruitLeft: fruitLeftCoordinate,
-          fruitTop: fruitTopCoordinate,
+    if (gameOver) {
+      Navigator.pushNamed(context, '/gameOverScreen');
+    } else {
+      return GestureDetector(
+        onTap: () {
+          incrementDirection();
+          startAnimation();
+        },
+        child: Scaffold(
+          body: snake(
+            score: score,
+            length: length,
+            listOfSnakeParts: coordinates,
+            fruitLeft: fruitLeftCoordinate,
+            fruitTop: fruitTopCoordinate,
+          ),
         ),
-      ),
-    );
+      );
+    }
+    return Container();
   }
 }
 
