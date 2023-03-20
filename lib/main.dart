@@ -7,18 +7,16 @@ void main() {
 
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
+
+/*
+  Map<String, WidgetBuilder> views = {
+    '/start': (BuildContext (context) => )
+  };
+*/
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: GestureDetector(
-        onTap: () {
-          snakeGameStateGlobalKey.currentState?.incrementDirection();
-          snakeGameStateGlobalKey.currentState?.startAnimation();
-        },
-        child: snakeGame(
-          key: snakeGameStateGlobalKey,
-        ),
-      ),
+      home: snakeGame(),
     );
   }
 }
@@ -208,13 +206,19 @@ class snakeGameState extends State<snakeGame>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: snake(
-        score: score,
-        length: length,
-        listOfSnakeParts: coordinates,
-        fruitLeft: fruitLeftCoordinate,
-        fruitTop: fruitTopCoordinate,
+    return GestureDetector(
+      onTap: () {
+        incrementDirection();
+        startAnimation();
+      },
+      child: Scaffold(
+        body: snake(
+          score: score,
+          length: length,
+          listOfSnakeParts: coordinates,
+          fruitLeft: fruitLeftCoordinate,
+          fruitTop: fruitTopCoordinate,
+        ),
       ),
     );
   }
