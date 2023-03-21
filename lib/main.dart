@@ -11,6 +11,10 @@ class MyApp extends StatelessWidget {
   int score = 0;
   MyApp();
 
+  /* Skapar en Map som innehåller två routes:
+    /start = Startskärm
+    /snakeGame = SpelWidget
+  */
   Map<String, WidgetBuilder> views = {
     '/start': (BuildContext context) => StartScreen(),
     '/snakeGame': (BuildContext context) => snakeGame(),
@@ -63,6 +67,9 @@ class StartScreenState extends State<StartScreen>
     super.dispose();
   }
 
+  /* Displayar en text som välkomnar spelaren och en knapp som spelaren 
+  kan trycka på för att starta spelet.
+*/
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -80,7 +87,7 @@ class StartScreenState extends State<StartScreen>
                     decoration: TextDecoration.none,
                     fontSize: 40.0,
                     color: Colors.white,
-                    fontFamily: 'PressStart2P',
+                    fontFamily: 'Prompt',
                     fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(
@@ -145,6 +152,10 @@ class snakeTounge extends StatelessWidget {
   }
 }
 
+/* Widget för all spellogik, denna widget räknar ut alla koordinater i varje
+frame och skickar sedan vidare dessa samt fler variabler till child widgets som
+renderar spelet på skärmen.
+*/
 class snakeGame extends StatefulWidget {
   snakeGame({Key? key}) : super(key: key);
 
@@ -179,6 +190,12 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
   final borderBottom = 852;
   snakeGameState();
 
+  /* Initierar fruktens slumpmässiga koordinater.
+  Sätter även upp en AnimationController class för att kunna 
+  komma åt widgetens build method varje frame.
+  På så sätt kan vi animera vår snake.
+  */
+
   @override
   void initState() {
     fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
@@ -188,22 +205,32 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
   }
 
   void setupAnimationController() {
+    // Skapandet av vår AnimationController object.
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     startAnimation();
 
+    /* Denna funktion definierar vilka variabler vi vill uppdatera varje frame.
+    Vi kollar även om vi har kolliderat med något object och ändrar då variabler
+    beroende på vad som skett */
     controller.addListener(() {
       setState(() {
+        // Kolla om vi ätit en frukt:
         collisionWithFruit();
+        // Kolla om vi kolliderat med oss själva:
         collisionWithSnake();
+        /* Kollar vilken riktning vi rör oss i, uppdaterar snakeHead beroende på 
+        riktning, uppdaterar resterande snakeParts beroende på vars föregående
+        snakeParten var.
+        */
         if (direction >= 1) {
           if ((direction % 4) == 1) {
-            if (frame % 10 == 0) {
+            if (frame % 14 == 0) {
               headTopPosition += 2;
               headLeftPosition += 2;
               frame++;
               updateCoordinates(headLeftPosition, headTopPosition);
-            } else if (frame % 10 == 4) {
+            } else if (frame % 14 == 7) {
               headTopPosition -= 2;
               headLeftPosition += 2;
               frame++;
@@ -214,12 +241,12 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
               updateCoordinates(headLeftPosition, headTopPosition);
             }
           } else if ((direction % 4) == 2) {
-            if (frame % 10 == 0) {
+            if (frame % 14 == 0) {
               headTopPosition += 2;
               headLeftPosition -= 2;
               frame++;
               updateCoordinates(headLeftPosition, headTopPosition);
-            } else if (frame % 10 == 5) {
+            } else if (frame % 14 == 7) {
               headTopPosition += 2;
               headLeftPosition += 2;
               frame++;
@@ -230,12 +257,12 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
               updateCoordinates(headLeftPosition, headTopPosition);
             }
           } else if ((direction % 4) == 3) {
-            if (frame % 10 == 0) {
+            if (frame % 14 == 0) {
               headTopPosition -= 2;
               headLeftPosition -= 2;
               frame++;
               updateCoordinates(headLeftPosition, headTopPosition);
-            } else if (frame % 10 == 4) {
+            } else if (frame % 14 == 7) {
               headTopPosition += 2;
               headLeftPosition -= 2;
               frame++;
@@ -246,12 +273,12 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
               updateCoordinates(headLeftPosition, headTopPosition);
             }
           } else if ((direction % 4) == 0) {
-            if (frame % 10 == 0) {
+            if (frame % 14 == 0) {
               headTopPosition -= 2;
               headLeftPosition -= 2;
               frame++;
               updateCoordinates(headLeftPosition, headTopPosition);
-            } else if (frame % 10 == 5) {
+            } else if (frame % 14 == 7) {
               headTopPosition -= 2;
               headLeftPosition += 2;
               frame++;
@@ -262,6 +289,7 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
               updateCoordinates(headLeftPosition, headTopPosition);
             }
           }
+          // Kolla om vi har kolliderat med någon vägg:
           collisionWithWall();
         }
       });
@@ -313,6 +341,11 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
     }
   }
 
+  /*
+  Denna metod fyller upp en List<List<int>> som innehåller koordinaterna
+  för alla snakens delar.
+  */
+
   List<List<double>> createSnake() {
     List<List<double>> startCoordinates =
         List<List<double>>.empty(growable: true);
@@ -349,28 +382,38 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
     }
   }
 
+  // Denna metod uppdaterar ormens längd när vi ätit en frukt.
+
   void updateCoordinatesWhenLengthIncreases(int direction) {
     double newContainerLeftCoordinate = coordinates[length - 3][0];
     double newContainerTopCoordinate = coordinates[length - 3][1];
     double secondNewContainerLeftCoordinate = coordinates[length - 3][0];
     double secondNewContainerTopCoordinate = coordinates[length - 3][1];
+    double thirdNewContainerLeftCoordinate = coordinates[length - 3][0];
+    double thirdNewContainerTopCoordinate = coordinates[length - 3][1];
     if (direction % 4 == 1) {
       newContainerLeftCoordinate -= 3;
       secondNewContainerLeftCoordinate -= 6;
+      thirdNewContainerLeftCoordinate -= 9;
     } else if (direction % 4 == 2) {
       newContainerTopCoordinate -= 3;
       secondNewContainerTopCoordinate -= 6;
+      thirdNewContainerTopCoordinate -= 9;
     } else if (direction % 4 == 3) {
       newContainerLeftCoordinate += 3;
       secondNewContainerLeftCoordinate += 6;
+      thirdNewContainerLeftCoordinate += 9;
     } else if (direction % 4 == 0) {
       newContainerTopCoordinate += 3;
       secondNewContainerTopCoordinate += 6;
+      thirdNewContainerTopCoordinate += 9;
     }
 
     coordinates.add([newContainerLeftCoordinate, newContainerTopCoordinate]);
     coordinates.add(
         [secondNewContainerLeftCoordinate, secondNewContainerTopCoordinate]);
+    coordinates
+        .add([thirdNewContainerLeftCoordinate, thirdNewContainerTopCoordinate]);
   }
 
   void incrementDirection() {
@@ -428,7 +471,7 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
                         decoration: TextDecoration.none,
                         fontSize: 40.0,
                         color: Colors.white,
-                        fontFamily: 'PressStart2P',
+                        fontFamily: 'Prompt',
                         fontWeight: FontWeight.bold,
                         shadows: [
                           Shadow(
@@ -446,7 +489,7 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
                       decoration: TextDecoration.none,
                       fontSize: 20.0,
                       color: Colors.white,
-                      fontFamily: 'PressStart2P',
+                      fontFamily: 'Prompt',
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
@@ -466,7 +509,7 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
                       decoration: TextDecoration.none,
                       fontSize: 20.0,
                       color: Colors.white,
-                      fontFamily: 'PressStart2P',
+                      fontFamily: 'Prompt',
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
