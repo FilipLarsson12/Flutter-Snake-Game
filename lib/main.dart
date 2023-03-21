@@ -6,7 +6,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  int score = 0;
+  MyApp();
 
   Map<String, WidgetBuilder> views = {
     '/start': (BuildContext context) => StartScreen(),
@@ -23,8 +24,44 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class StartScreen extends StatelessWidget {
-  StartScreen();
+class StartScreen extends StatefulWidget {
+  @override
+  StartScreenState createState() => StartScreenState();
+}
+
+class StartScreenState extends State<StartScreen>
+    with SingleTickerProviderStateMixin {
+  double frame = 0;
+  late AnimationController controller;
+  List<List<double>> coordinates = [];
+
+  StartScreenState();
+  @override
+  void initState() {
+    controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    startAnimation();
+
+    controller.addListener(() {
+      setState(() {
+        frame++;
+        if (frame % 5 == 0 && frame < 100) {
+          coordinates.add([frame * 2, 200]);
+        }
+      });
+    });
+  }
+
+  void startAnimation() {
+    controller.repeat();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,6 +78,46 @@ class StartScreen extends StatelessWidget {
   }
 }
 
+class snakeTounge extends StatelessWidget {
+  double left;
+  double top;
+  snakeTounge({required this.left, required this.top});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: left,
+      top: top,
+      child: Container(
+        decoration: BoxDecoration(color: Colors.blue),
+        width: 10,
+        height: 10,
+        child: Column(
+          children: [
+            Positioned(
+                left: left,
+                top: top + 4,
+                child: Container(
+                  width: 4,
+                  height: 1,
+                  decoration: BoxDecoration(color: Colors.red),
+                )),
+            Positioned(
+              left: left + 4,
+              top: top + 3,
+              child: Container(
+                decoration: BoxDecoration(color: Colors.red),
+                width: 1,
+                height: 3,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class gameOverScreen extends StatelessWidget {
   gameOverScreen();
 
@@ -49,10 +126,25 @@ class gameOverScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(color: Colors.red),
       child: Center(
-          child: Text(
-        "Game Over!",
-        style: TextStyle(color: Colors.black, fontSize: 20),
-      )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: Text(
+                "Game Over!",
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              margin: EdgeInsets.only(bottom: 10),
+            ),
+            ElevatedButton(
+              child: Text("Spela igen"),
+              onPressed: () {
+                Navigator.pushNamed(context, '/snakeGame');
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -70,8 +162,9 @@ final GlobalKey<snakeGameState> snakeGameStateGlobalKey =
 
 class snakeGameState extends State<snakeGame>
     with SingleTickerProviderStateMixin {
-  bool gameOver = false;
+  int usefulVariable = 0;
   int score = 0;
+  bool gameOver = false;
   int frame = 0;
   late double headLeftPosition = 100;
   late double headTopPosition = 100;
@@ -87,6 +180,7 @@ class snakeGameState extends State<snakeGame>
   final borderRight = 381;
   final borderTop = 84;
   final borderBottom = 852;
+  snakeGameState();
 
   @override
   void initState() {
@@ -95,76 +189,79 @@ class snakeGameState extends State<snakeGame>
     coordinates = createSnake();
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
+    startAnimation();
 
     controller.addListener(() {
       setState(() {
         collisionWithFruit();
         collisionWithSnake();
-        collisionWithWall();
-        if ((direction % 4) == 1) {
-          if (frame % 10 == 0) {
-            headTopPosition += 2;
-            headLeftPosition += 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else if (frame % 10 == 4) {
-            headTopPosition -= 2;
-            headLeftPosition += 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else {
-            headLeftPosition += 4;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
+        if (direction >= 1) {
+          if ((direction % 4) == 1) {
+            if (frame % 10 == 0) {
+              headTopPosition += 2;
+              headLeftPosition += 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else if (frame % 10 == 4) {
+              headTopPosition -= 2;
+              headLeftPosition += 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else {
+              headLeftPosition += 4;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            }
+          } else if ((direction % 4) == 2) {
+            if (frame % 10 == 0) {
+              headTopPosition += 2;
+              headLeftPosition -= 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else if (frame % 10 == 5) {
+              headTopPosition += 2;
+              headLeftPosition += 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else {
+              headTopPosition += 4;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            }
+          } else if ((direction % 4) == 3) {
+            if (frame % 10 == 0) {
+              headTopPosition -= 2;
+              headLeftPosition -= 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else if (frame % 10 == 4) {
+              headTopPosition += 2;
+              headLeftPosition -= 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else {
+              headLeftPosition -= 4;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            }
+          } else if ((direction % 4) == 0) {
+            if (frame % 10 == 0) {
+              headTopPosition -= 2;
+              headLeftPosition -= 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else if (frame % 10 == 5) {
+              headTopPosition -= 2;
+              headLeftPosition += 2;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            } else {
+              headTopPosition -= 4;
+              frame++;
+              updateCoordinates(headLeftPosition, headTopPosition);
+            }
           }
-        } else if ((direction % 4) == 2) {
-          if (frame % 10 == 0) {
-            headTopPosition += 2;
-            headLeftPosition -= 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else if (frame % 10 == 5) {
-            headTopPosition += 2;
-            headLeftPosition += 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else {
-            headTopPosition += 4;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          }
-        } else if ((direction % 4) == 3) {
-          if (frame % 10 == 0) {
-            headTopPosition -= 2;
-            headLeftPosition -= 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else if (frame % 10 == 4) {
-            headTopPosition += 2;
-            headLeftPosition -= 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else {
-            headLeftPosition -= 4;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          }
-        } else if ((direction % 4) == 0) {
-          if (frame % 10 == 0) {
-            headTopPosition -= 2;
-            headLeftPosition -= 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else if (frame % 10 == 5) {
-            headTopPosition -= 2;
-            headLeftPosition += 2;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          } else {
-            headTopPosition -= 4;
-            frame++;
-            updateCoordinates(headLeftPosition, headTopPosition);
-          }
+          collisionWithWall();
         }
       });
     });
@@ -216,9 +313,9 @@ class snakeGameState extends State<snakeGame>
             coordinates[0][0] <= fruitLeftCoordinate + 10) &&
         (coordinates[0][1] >= fruitTopCoordinate - 10 &&
             coordinates[0][1] <= fruitTopCoordinate + 10)) {
-      score++;
       fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
       fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
+      score++;
       length += 2;
       updateCoordinatesWhenLengthIncreases(direction);
     }
@@ -289,28 +386,45 @@ class snakeGameState extends State<snakeGame>
     super.dispose();
   }
 
+  void resetGame() {
+    setState(() {
+      gameOver = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (gameOver) {
-      Navigator.pushNamed(context, '/gameOverScreen');
+      return Container(
+        decoration: BoxDecoration(color: Colors.blue),
+        child: Center(
+          child: ElevatedButton(
+            child: Text("Spela igen"),
+            onPressed: () {
+              resetGame();
+            },
+          ),
+        ),
+      );
     } else {
-      return GestureDetector(
-        onTap: () {
-          incrementDirection();
-          startAnimation();
-        },
-        child: Scaffold(
-          body: snake(
-            score: score,
-            length: length,
-            listOfSnakeParts: coordinates,
-            fruitLeft: fruitLeftCoordinate,
-            fruitTop: fruitTopCoordinate,
+      return Container(
+        decoration: BoxDecoration(color: Colors.black),
+        child: GestureDetector(
+          onTap: () {
+            incrementDirection();
+          },
+          child: Scaffold(
+            body: snake(
+              score: score,
+              length: length,
+              listOfSnakeParts: coordinates,
+              fruitLeft: fruitLeftCoordinate,
+              fruitTop: fruitTopCoordinate,
+            ),
           ),
         ),
       );
     }
-    return Container();
   }
 }
 
@@ -408,276 +522,71 @@ class snake extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.only(bottom: 2),
-          margin: EdgeInsets.only(top: 50, bottom: 5, right: 270),
-          height: 25,
-          width: 100,
-          decoration: BoxDecoration(color: Colors.white),
-          child: Text(
-            "Score: $score",
-            style: TextStyle(
-              fontSize: 20.0,
-              color: Colors.black,
-              fontFamily: 'RetroGaming',
-              shadows: [
-                Shadow(
-                  blurRadius: 2.0,
-                  color: Colors.black,
-                  offset: Offset(1.0, 1.0),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Center(
-          child: Container(
-            margin: EdgeInsets.only(bottom: 5),
-            width: 370,
-            height: 780,
+    return Container(
+      decoration: BoxDecoration(color: Colors.black),
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.only(bottom: 2, left: 4),
+            margin: EdgeInsets.only(top: 50, bottom: 5, right: 270),
+            height: 30,
+            width: 120,
             decoration: BoxDecoration(
-                border: Border.all(width: 2.0, color: Colors.black)),
-            child: Stack(
-              children: List.generate(length, (index) {
-                final double left = listOfSnakeParts[index][0];
-                final double top = listOfSnakeParts[index][1];
-                if (index == 0) {
-                  return SnakeHead(left: left, top: top);
-                } else if (index < length - 1) {
-                  if (index % 2 == 0) {
-                    return SnakePart(
-                      left: left,
-                      top: top,
-                      color: Colors.red,
-                    );
-                  } else {
-                    return SnakePart(
-                      left: left,
-                      top: top,
-                      color: Colors.black,
-                    );
-                  }
-                } else {
-                  return Fruit(left: fruitLeft, top: fruitTop);
-                }
-              }),
+                color: Colors.white,
+                border: Border.all(width: 2.0, color: Colors.blue)),
+            child: Text(
+              "Score: $score",
+              style: TextStyle(
+                fontSize: 20.0,
+                color: Colors.black,
+                fontFamily: 'RetroGaming',
+                shadows: [
+                  Shadow(
+                    blurRadius: 2.0,
+                    color: Colors.black,
+                    offset: Offset(1.0, 1.0),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-}
-
-
-/*
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GestureDetector(
-        onTap: () {
-          SnakeHeadStateGlobalKey.currentState?.incrementDirection();
-          snakePartStateGlobalKey.currentState?.incrementDirection();
-          SnakeHeadStateGlobalKey.currentState?.startAnimation();
-          snakePartStateGlobalKey.currentState?.startAnimation();
-        },
-        child: Scaffold(
-          body: Stack(
-            children: [
-              SnakeHead(
-                direction: 0,
-                left: 100,
-                top: 100,
-                key: SnakeHeadStateGlobalKey,
+          Center(
+            child: Container(
+              margin: EdgeInsets.only(bottom: 5),
+              width: 370,
+              height: 780,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(width: 2.0, color: Colors.blue)),
+              child: Stack(
+                children: List.generate(length, (index) {
+                  final double left = listOfSnakeParts[index][0];
+                  final double top = listOfSnakeParts[index][1];
+                  if (index == 0) {
+                    return SnakeHead(left: left, top: top);
+                  } else if (index < length - 1) {
+                    if (index % 2 == 0) {
+                      return SnakePart(
+                        left: left,
+                        top: top,
+                        color: Colors.red,
+                      );
+                    } else {
+                      return SnakePart(
+                        left: left,
+                        top: top,
+                        color: Colors.black,
+                      );
+                    }
+                  } else {
+                    return Fruit(left: fruitLeft, top: fruitTop);
+                  }
+                }),
               ),
-              snakePart(
-                lag: 0,
-                direction: 0,
-                left: 100 - 1,
-                top: 100,
-                key: snakePartStateGlobalKey,
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
 }
-
-class SnakeHead extends StatefulWidget {
-  final int direction;
-  final double left;
-  final double top;
-  SnakeHead(
-      {required this.direction,
-      required this.left,
-      required this.top,
-      Key? key})
-      : super(key: key);
-
-  @override
-  SnakeHeadState createState() => SnakeHeadState();
-}
-
-// Key för att komma åt SnakeHeadState från parent widget.
-final GlobalKey<SnakeHeadState> SnakeHeadStateGlobalKey =
-    GlobalKey<SnakeHeadState>();
-
-class SnakeHeadState extends State<SnakeHead>
-    with SingleTickerProviderStateMixin {
-  late int direction;
-  late double left;
-  late double top;
-  late AnimationController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    direction = widget.direction;
-    left = widget.left;
-    top = widget.top;
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    );
-
-    controller.addListener(() {
-      setState(() {
-        if ((direction % 4) == 1) {
-          left += 1;
-        } else if ((direction % 4) == 2) {
-          top += 1;
-        } else if ((direction % 4) == 3) {
-          left -= 1;
-        } else if ((direction % 4) == 0) {
-          top -= 1;
-        }
-      });
-    });
-  }
-
-  void incrementDirection() {
-    direction++;
-  }
-
-  void startAnimation() {
-    controller.repeat();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: left,
-      top: top,
-      child: Container(
-        decoration: BoxDecoration(color: Colors.black),
-        width: 10,
-        height: 10,
-      ),
-    );
-  }
-}
-
-class snakePart extends StatefulWidget {
-  final int lag;
-  final int direction;
-  final double left;
-  final double top;
-  snakePart(
-      {required this.lag,
-      required this.direction,
-      required this.left,
-      required this.top,
-      Key? key})
-      : super(key: key);
-
-  @override
-  snakePartState createState() => snakePartState();
-}
-
-// Key för att komma åt snakePartState från parent widget.
-final GlobalKey<snakePartState> snakePartStateGlobalKey =
-    GlobalKey<snakePartState>();
-
-class snakePartState extends State<snakePart>
-    with SingleTickerProviderStateMixin {
-  late int lag;
-  late int direction;
-  late double left;
-  late double top;
-  late AnimationController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    lag = widget.lag;
-    direction = widget.direction;
-    left = widget.left;
-    top = widget.top;
-
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    );
-
-    controller.addListener(() {
-      setState(() {
-        lag++;
-        if (((direction % 4) == 1) || (direction % 4 == 2) && lag < 1) {
-          left += 1;
-        } else if (((direction % 4) == 2) || (direction % 4 == 3) && lag < 1) {
-          top += 1;
-        } else if (((direction % 4) == 3) || (direction % 4 == 0) && lag < 1) {
-          left -= 1;
-        } else if (((direction % 4) == 0) || (direction % 4 == 1) && lag < 1) {
-          top -= 1;
-        }
-      });
-    });
-  }
-
-  void incrementDirection() {
-    direction++;
-    lag = 0;
-  }
-
-  void startAnimation() {
-    setState(() {
-      controller.repeat();
-    });
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: left,
-      top: top,
-      child: Container(
-        decoration: BoxDecoration(color: Colors.black),
-        width: 10,
-        height: 10,
-      ),
-    );
-  }
-}
-
-*/
-
