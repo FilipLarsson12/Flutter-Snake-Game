@@ -416,19 +416,25 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
         .add([thirdNewContainerLeftCoordinate, thirdNewContainerTopCoordinate]);
   }
 
+  // Denna metod uppdaterar ormens riktning.
+
   void incrementDirection() {
     direction++;
   }
 
+  // Denna metod initierar AnimationControllern.
   void startAnimation() {
     controller.repeat();
   }
 
+  // Tar bort nuvarande AnimationController.
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
   }
+
+  // Denna metod återställer alla variabler som är nödvändiga och startar om spelet.
 
   void resetGame() {
     if (usefulVariable == 0) {
@@ -451,6 +457,11 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
       setupAnimationController();
     }
   }
+
+  /* build metoden returnerar en game-over screen om spelaren förlorat.
+  Där kan spelaren välja mellan att gå tillbaka till startskärmen eller 
+  försöka igen. 
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -565,6 +576,8 @@ class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
   }
 }
 
+//Widget för att representera ormens huvud.
+
 class SnakeHead extends StatelessWidget {
   final double left;
   final double top;
@@ -587,6 +600,8 @@ class SnakeHead extends StatelessWidget {
     );
   }
 }
+
+//Widget för att representera ormens kroppsdelar.
 
 class SnakePart extends StatelessWidget {
   final double left;
@@ -611,6 +626,8 @@ class SnakePart extends StatelessWidget {
     );
   }
 }
+
+// Widget för att representera frukt.
 
 class Fruit extends StatelessWidget {
   final double left;
@@ -643,6 +660,10 @@ class Fruit extends StatelessWidget {
     );
   }
 }
+
+/* Widget för att representera ormen men den bygger även fler saker
+ Nödvändiga för att spelet ska fungera som det ska.
+ */
 
 class snake extends StatelessWidget {
   int highscore;
