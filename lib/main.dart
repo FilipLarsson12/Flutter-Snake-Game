@@ -5,6 +5,8 @@ void main() {
   runApp(MyApp());
 }
 
+//Grundwidget
+
 class MyApp extends StatelessWidget {
   int score = 0;
   MyApp();
@@ -12,7 +14,6 @@ class MyApp extends StatelessWidget {
   Map<String, WidgetBuilder> views = {
     '/start': (BuildContext context) => StartScreen(),
     '/snakeGame': (BuildContext context) => snakeGame(),
-    '/gameOverScreen': (BuildContext context) => gameOverScreen(),
   };
 
   @override
@@ -137,37 +138,6 @@ class snakeTounge extends StatelessWidget {
                 height: 3,
               ),
             )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class gameOverScreen extends StatelessWidget {
-  gameOverScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(color: Colors.red),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              child: Text(
-                "Game Over!",
-                style: TextStyle(color: Colors.black, fontSize: 20),
-              ),
-              margin: EdgeInsets.only(bottom: 10),
-            ),
-            ElevatedButton(
-              child: Text("Spela igen"),
-              onPressed: () {
-                Navigator.pushNamed(context, '/snakeGame');
-              },
-            ),
           ],
         ),
       ),
