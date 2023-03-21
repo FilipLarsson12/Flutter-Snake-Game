@@ -65,14 +65,40 @@ class StartScreenState extends State<StartScreen>
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: Colors.orange),
-      child: Center(
-        child: ElevatedButton(
-          child: Text("Starta Spel"),
-          onPressed: () {
-            Navigator.pushNamed(context, '/snakeGame');
-          },
-        ),
+      decoration: BoxDecoration(color: Colors.amber),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.only(bottom: 50),
+            child: Center(
+              child: Text(
+                "Välkommen till Snake!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    decoration: TextDecoration.none,
+                    fontSize: 40.0,
+                    color: Colors.white,
+                    fontFamily: 'PressStart2P',
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(
+                          blurRadius: 2.0,
+                          color: Colors.black,
+                          offset: Offset(1.0, 1.0)),
+                    ]),
+              ),
+            ),
+          ),
+          Center(
+            child: ElevatedButton(
+              child: Text("Starta Spel"),
+              onPressed: () {
+                Navigator.pushNamed(context, '/snakeGame');
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -160,9 +186,10 @@ class snakeGame extends StatefulWidget {
 final GlobalKey<snakeGameState> snakeGameStateGlobalKey =
     GlobalKey<snakeGameState>();
 
-class snakeGameState extends State<snakeGame>
-    with SingleTickerProviderStateMixin {
+class snakeGameState extends State<snakeGame> with TickerProviderStateMixin {
+  bool controllerExist = false;
   int usefulVariable = 0;
+  int highscore = 0;
   int score = 0;
   bool gameOver = false;
   int frame = 0;
@@ -187,6 +214,10 @@ class snakeGameState extends State<snakeGame>
     fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
     fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
     coordinates = createSnake();
+    setupAnimationController();
+  }
+
+  void setupAnimationController() {
     controller =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
     startAnimation();
@@ -267,15 +298,6 @@ class snakeGameState extends State<snakeGame>
     });
   }
 
-  List<List<double>> createSnake() {
-    List<List<double>> startCoordinates =
-        List<List<double>>.empty(growable: true);
-    for (int i = 0; i < length; i++) {
-      startCoordinates.add([100 - (i * 3), 100]);
-    }
-    return startCoordinates;
-  }
-
   /* Method to update the entire coordinate list of the Snake. 
   The movement of the Snake head should be dependent on direction
   and the movement of the remaining snake parts should be dependent
@@ -319,6 +341,15 @@ class snakeGameState extends State<snakeGame>
       length += 2;
       updateCoordinatesWhenLengthIncreases(direction);
     }
+  }
+
+  List<List<double>> createSnake() {
+    List<List<double>> startCoordinates =
+        List<List<double>>.empty(growable: true);
+    for (int i = 0; i < length; i++) {
+      startCoordinates.add([100 - (i * 3), 100]);
+    }
+    return startCoordinates;
   }
 
   /* Check if the snake has collided with itself. 
@@ -387,25 +418,117 @@ class snakeGameState extends State<snakeGame>
   }
 
   void resetGame() {
-    setState(() {
+    if (usefulVariable == 0) {
+      if (score > highscore) {
+        highscore = score;
+      }
+      usefulVariable++;
+      controller.dispose();
+      coordinates.clear();
+      headLeftPosition = 100;
+      headTopPosition = 100;
       gameOver = false;
-    });
+      length = 10;
+      direction = 0;
+      score = 0;
+      frame = 0;
+      fruitLeftCoordinate = random.nextDouble() * (borderRight - borderLeft);
+      fruitTopCoordinate = random.nextDouble() * (borderBottom - borderTop);
+      coordinates = createSnake();
+      setupAnimationController();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (gameOver) {
+      usefulVariable = 0;
       return Container(
-        decoration: BoxDecoration(color: Colors.blue),
-        child: Center(
-          child: ElevatedButton(
-            child: Text("Spela igen"),
-            onPressed: () {
-              resetGame();
-            },
-          ),
-        ),
-      );
+          decoration: BoxDecoration(color: Colors.amber),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(bottom: 50),
+                  child: Text(
+                    "Spel över",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        decoration: TextDecoration.none,
+                        fontSize: 40.0,
+                        color: Colors.white,
+                        fontFamily: 'PressStart2P',
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                              blurRadius: 2.0,
+                              color: Colors.black,
+                              offset: Offset(1.0, 1.0)),
+                        ]),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    "Din poäng var: $score",
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      fontSize: 20.0,
+                      color: Colors.white,
+                      fontFamily: 'PressStart2P',
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 2.0,
+                          color: Colors.black,
+                          offset: Offset(1.0, 1.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 10),
+                  child: Text(
+                    "Högsta poäng: $highscore",
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      fontSize: 20.0,
+                      color: Colors.white,
+                      fontFamily: 'PressStart2P',
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 2.0,
+                          color: Colors.black,
+                          offset: Offset(1.0, 1.0),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: ElevatedButton(
+                    child: Text("Spela igen"),
+                    onPressed: () {
+                      resetGame();
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: ElevatedButton(
+                    child: Text("Tillbaka till Startskärm"),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/start');
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ));
     } else {
       return Container(
         decoration: BoxDecoration(color: Colors.black),
@@ -415,6 +538,7 @@ class snakeGameState extends State<snakeGame>
           },
           child: Scaffold(
             body: snake(
+              highscore: highscore,
               score: score,
               length: length,
               listOfSnakeParts: coordinates,
@@ -489,7 +613,7 @@ class Fruit extends StatelessWidget {
       child: Container(
         width: 10,
         height: 10,
-        decoration: BoxDecoration(color: Color.fromARGB(176, 44, 193, 14)),
+        decoration: BoxDecoration(color: Color.fromARGB(175, 90, 244, 59)),
         child: Center(
           child: Container(
             padding: EdgeInsets.only(bottom: 5),
@@ -508,13 +632,15 @@ class Fruit extends StatelessWidget {
 }
 
 class snake extends StatelessWidget {
+  int highscore;
   int score;
   int length;
   List<List<double>> listOfSnakeParts;
   double fruitLeft;
   double fruitTop;
   snake(
-      {required this.score,
+      {required this.highscore,
+      required this.score,
       required this.length,
       required this.listOfSnakeParts,
       required this.fruitLeft,
@@ -526,29 +652,61 @@ class snake extends StatelessWidget {
       decoration: BoxDecoration(color: Colors.black),
       child: Column(
         children: [
-          Container(
-            padding: EdgeInsets.only(bottom: 2, left: 4),
-            margin: EdgeInsets.only(top: 50, bottom: 5, right: 270),
-            height: 30,
-            width: 120,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(width: 2.0, color: Colors.blue)),
-            child: Text(
-              "Score: $score",
-              style: TextStyle(
-                fontSize: 20.0,
-                color: Colors.black,
-                fontFamily: 'RetroGaming',
-                shadows: [
-                  Shadow(
-                    blurRadius: 2.0,
-                    color: Colors.black,
-                    offset: Offset(1.0, 1.0),
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.only(bottom: 2, left: 4),
+                margin: EdgeInsets.only(top: 50, bottom: 5, right: 5, left: 22),
+                height: 30,
+                width: 120,
+                decoration: BoxDecoration(
+                    color: Colors.red,
+                    border: Border.all(width: 2.0, color: Colors.blue)),
+                child: Text(
+                  "Score: $score",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                    fontFamily: 'RetroGaming',
+                    shadows: [
+                      Shadow(
+                        blurRadius: 2.0,
+                        color: Colors.black,
+                        offset: Offset(1.0, 1.0),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              Container(
+                padding: EdgeInsets.only(bottom: 2, left: 4),
+                margin: EdgeInsets.only(
+                  left: 2,
+                  top: 50,
+                  bottom: 5,
+                ),
+                height: 30,
+                width: 150,
+                decoration: BoxDecoration(
+                    color: Colors.red,
+                    border: Border.all(width: 2.0, color: Colors.blue)),
+                child: Text(
+                  "HighScore: $highscore",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.white,
+                    fontFamily: 'RetroGaming',
+                    shadows: [
+                      Shadow(
+                        blurRadius: 2.0,
+                        color: Colors.black,
+                        offset: Offset(1.0, 1.0),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           Center(
             child: Container(
@@ -556,8 +714,9 @@ class snake extends StatelessWidget {
               width: 370,
               height: 780,
               decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(width: 2.0, color: Colors.blue)),
+                  color: Color.fromARGB(255, 72, 156, 225),
+                  border: Border.all(
+                      width: 2.0, color: Color.fromARGB(255, 22, 55, 81))),
               child: Stack(
                 children: List.generate(length, (index) {
                   final double left = listOfSnakeParts[index][0];
